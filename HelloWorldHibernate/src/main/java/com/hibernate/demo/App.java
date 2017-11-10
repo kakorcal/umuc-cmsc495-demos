@@ -1,0 +1,213 @@
+package com.hibernate.demo;
+
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+
+public class App extends JFrame {
+	private InventoryManager manager = null;
+	
+	public static void main(String[] args) {
+		App app = new App();
+		app.display();
+	}
+
+	public App() {
+		super("Inventory Manager");
+		setFrame();
+		add(new MainPanel());
+		
+		manager = new InventoryManager();
+		manager.setUp();
+		addWindowListener(new WindowAdapter() {
+		    public void windowClosing(WindowEvent e) {
+		    	manager.exit();
+		    }
+		});
+	}
+
+	private void display() {
+		setVisible(true);
+	}
+
+	private void setFrame() {
+		setPreferredSize(new Dimension(600, 500));
+		pack(); 
+		setLocationRelativeTo(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
+	public class MainPanel extends JPanel {
+		private JButton readButton = new JButton("Read");
+		private JButton createButton = new JButton("Create");
+		private JButton updateButton = new JButton("Update");
+		private JButton deleteButton = new JButton("Delete");
+		private JButton listButton = new JButton("List All");
+		
+		private JLabel idLabel = new JLabel("Id: ");
+		private JTextField idField = new JTextField(10);
+		private JLabel nameLabel = new JLabel("Name: ");
+		private JTextField nameField = new JTextField(10);
+		private JLabel quantityLabel = new JLabel("Quantity: ");
+		private JTextField quantityField = new JTextField(10);
+		
+		private JTextArea textarea = new JTextArea(22, 45);
+		private JScrollPane textareaScrollPane = new JScrollPane(textarea, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		
+		public MainPanel() {
+			/*
+			 * Container
+			 */
+			setLayout(new GridBagLayout());
+			GridBagConstraints constraints = new GridBagConstraints();
+			
+			/*
+			 * Inputs and Labels
+			 */
+			JPanel inputsPanel = new JPanel();
+			inputsPanel.add(idLabel);
+			inputsPanel.add(idField);
+			inputsPanel.add(nameLabel);
+			inputsPanel.add(nameField);
+			inputsPanel.add(quantityLabel);
+			inputsPanel.add(quantityField);
+						
+			/*
+			 * Buttons
+			 */
+			JPanel buttonsPanel = new JPanel();
+			buttonsPanel.add(readButton);
+			buttonsPanel.add(createButton);
+			buttonsPanel.add(updateButton);
+			buttonsPanel.add(deleteButton);
+			buttonsPanel.add(listButton);
+			
+			/*
+			 * Textarea
+			 */
+			JPanel textareaPanel = new JPanel();
+			textarea.setEditable(false);
+			textarea.setBackground(getBackground());
+			textareaPanel.add(textareaScrollPane);
+			textareaPanel.setMinimumSize(new Dimension(325, getHeight()));
+			
+			/*
+			 * Event Listeners
+			 * */
+			readButton.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent e) {
+	            	String idStr = idField.getText();
+	            	
+	            	try {
+	            		long id = Long.parseLong(idStr);
+	            		Inventory inventory = manager.read(id);
+	            		
+	            		if(inventory != null) {
+	            			textarea.setText("Item found:\n" + inventory.toString());
+	            		}else {
+	            			textarea.setText("Item not found");
+	            		}	            		
+	            	}catch (NumberFormatException err) {
+	            		textarea.setText("Item not found.");
+	            	}
+	            	
+	            }
+	        });
+			
+			createButton.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent e) {
+	            	String idStr = idField.getText();
+	            	String nameStr = nameField.getText();
+	            	String quantityStr = quantityField.getText();
+	            	
+	            	try {
+	            		long id = Long.parseLong(idStr);
+	            		int quantity = Integer.parseInt(quantityStr);
+	            		Inventory inventory = manager.create(new Inventory(id, nameStr, quantity));
+	            		textarea.setText("Item created:\n" + inventory.toString());		
+	            	}catch (NumberFormatException err) {
+	            		textarea.setText("Item not found");
+	            	}
+	            	
+	            }
+	        });
+			
+			updateButton.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent e) {
+	            	String idStr = idField.getText();
+	            	String nameStr = nameField.getText();
+	            	String quantityStr = quantityField.getText();
+	            	
+	            	try {
+	            		long id = Long.parseLong(idStr);
+	            		int quantity = Integer.parseInt(quantityStr);
+	            		Inventory inventory = manager.update(new Inventory(id, nameStr, quantity));
+	            		textarea.setText("Item updated:\n" + inventory.toString());		
+	            	}catch (NumberFormatException err) {
+	            		textarea.setText("Item not found");
+	            	}	
+	            }
+	        });
+			
+			deleteButton.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent e) {
+	            	String idStr = idField.getText();
+	            	
+	            	try {
+	            		long id = Long.parseLong(idStr);
+	            		Inventory inventory = manager.delete(id);
+	            		
+	            		if(inventory != null) {
+	            			textarea.setText("Item deleted:\n" + inventory.toString());
+	            		}else {
+	            			textarea.setText("Item not found");
+	            		}	            		
+	            	}catch (NumberFormatException err) {
+	            		textarea.setText("Item not found.");
+	            	}
+	            	
+	            }
+	        });
+			
+			listButton.addActionListener(new ActionListener() {
+	            public void actionPerformed(ActionEvent e) {
+	            	List<Inventory> inventories = manager.list();
+	            	
+	            	if(!inventories.isEmpty()) {
+	            		String result = "Current Items:\n";
+	            			            		
+	            		for(Inventory inventory : inventories) {
+	            			result += inventory.toString() + "\n\n";
+	            		}
+	            	}else {
+	            		textarea.setText("No items found.");
+	            	}	            	
+	            }
+	        });
+			
+			
+			constraints.gridy = 0;
+			add(inputsPanel, constraints);
+			
+			constraints.gridy = 1;
+			add(buttonsPanel, constraints);
+			
+			constraints.gridy = 2;
+			add(textareaPanel, constraints);
+		}
+		
+	}
+}

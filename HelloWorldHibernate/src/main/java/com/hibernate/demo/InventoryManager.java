@@ -22,8 +22,7 @@ public class InventoryManager {
 				.build();
 		try {
 			sessionFactory = new MetadataSources(registry).buildMetadata().buildSessionFactory();
-		}
-		catch (Exception e) {
+		}catch (Exception e) {
 			e.printStackTrace();
 			// The registry would be destroyed by the SessionFactory, but we had trouble building the SessionFactory so destroy it manually.
 			StandardServiceRegistryBuilder.destroy(registry);
@@ -34,7 +33,7 @@ public class InventoryManager {
 		sessionFactory.close();
 	}
 	
-	protected void create(Inventory inventory) {		
+	protected Inventory create(Inventory inventory) {		
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		
@@ -45,6 +44,8 @@ public class InventoryManager {
 		
 		session.getTransaction().commit();
 		session.close();
+		
+		return inventory;
 	}
 	
 	protected Inventory read(long id) {
@@ -121,13 +122,4 @@ public class InventoryManager {
 		
 		return list;
 	}
-	
-	public static void main(String[] args) {
-		InventoryManager manager = new InventoryManager();
-		manager.setUp();
-		// Add create, read, update, delete, and list operations here
-		
-		manager.exit();
-	}
-
 }

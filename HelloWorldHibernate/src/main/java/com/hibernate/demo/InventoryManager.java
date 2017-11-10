@@ -70,12 +70,14 @@ public class InventoryManager {
 		session.beginTransaction();
 		
 		long id = inventory.getId();
-		Inventory newInventory = session.load(Inventory.class, id);
+		Inventory newInventory = session.get(Inventory.class, id);
 		
 		if(newInventory != null) {
-			session.update(inventory);
+			newInventory.setName(inventory.getName());
+			newInventory.setQuantity(inventory.getQuantity());
+			session.update(newInventory);
 			System.out.println("Inventory updated: ");
-			System.out.println(inventory.toString());			
+			System.out.println(newInventory.toString());			
 		}else {
 			System.out.println("Inventory id: " + id + " does not exist");
 		}
@@ -90,7 +92,7 @@ public class InventoryManager {
 		Session session = sessionFactory.openSession();
 		session.beginTransaction();
 		
-		Inventory inventory = session.load(Inventory.class, id);
+		Inventory inventory = session.get(Inventory.class, id);
 		
 		if(inventory != null) {
 			session.delete(inventory);

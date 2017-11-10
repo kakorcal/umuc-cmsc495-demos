@@ -69,12 +69,6 @@ public class App extends JFrame {
 		
 		public MainPanel() {
 			/*
-			 * Container
-			 */
-			setLayout(new GridBagLayout());
-			GridBagConstraints constraints = new GridBagConstraints();
-			
-			/*
 			 * Inputs and Labels
 			 */
 			JPanel inputsPanel = new JPanel();
@@ -116,7 +110,7 @@ public class App extends JFrame {
 	            		Inventory inventory = manager.read(id);
 	            		
 	            		if(inventory != null) {
-	            			textarea.setText("Item found:\n" + inventory.toString());
+	            			textarea.setText("Item found:\n\n" + inventory.toString());
 	            		}else {
 	            			textarea.setText("Item not found");
 	            		}	            		
@@ -129,17 +123,15 @@ public class App extends JFrame {
 			
 			createButton.addActionListener(new ActionListener() {
 	            public void actionPerformed(ActionEvent e) {
-	            	String idStr = idField.getText();
 	            	String nameStr = nameField.getText();
 	            	String quantityStr = quantityField.getText();
 	            	
 	            	try {
-	            		long id = Long.parseLong(idStr);
 	            		int quantity = Integer.parseInt(quantityStr);
-	            		Inventory inventory = manager.create(new Inventory(id, nameStr, quantity));
-	            		textarea.setText("Item created:\n" + inventory.toString());		
+	            		Inventory inventory = manager.create(new Inventory(nameStr, quantity));
+	            		textarea.setText("Item created:\n\n" + inventory.toString());		
 	            	}catch (NumberFormatException err) {
-	            		textarea.setText("Item not found");
+	            		textarea.setText("Failed to create item.");
 	            	}
 	            	
 	            }
@@ -155,9 +147,14 @@ public class App extends JFrame {
 	            		long id = Long.parseLong(idStr);
 	            		int quantity = Integer.parseInt(quantityStr);
 	            		Inventory inventory = manager.update(new Inventory(id, nameStr, quantity));
-	            		textarea.setText("Item updated:\n" + inventory.toString());		
+	            		
+	            		if(inventory != null) {
+	            			textarea.setText("Item updated:\n\n" + inventory.toString());		
+	            		}else {
+	            			textarea.setText("Failed to update item.");
+	            		}
 	            	}catch (NumberFormatException err) {
-	            		textarea.setText("Item not found");
+	            		textarea.setText("Item not found.");
 	            	}	
 	            }
 	        });
@@ -171,9 +168,9 @@ public class App extends JFrame {
 	            		Inventory inventory = manager.delete(id);
 	            		
 	            		if(inventory != null) {
-	            			textarea.setText("Item deleted:\n" + inventory.toString());
+	            			textarea.setText("Item deleted:\n\n" + inventory.toString());
 	            		}else {
-	            			textarea.setText("Item not found");
+	            			textarea.setText("Failed to delete item.");
 	            		}	            		
 	            	}catch (NumberFormatException err) {
 	            		textarea.setText("Item not found.");
@@ -187,17 +184,25 @@ public class App extends JFrame {
 	            	List<Inventory> inventories = manager.list();
 	            	
 	            	if(!inventories.isEmpty()) {
-	            		String result = "Current Items:\n";
+	            		String result = "Current Items:\n\n";
 	            			            		
 	            		for(Inventory inventory : inventories) {
 	            			result += inventory.toString() + "\n\n";
 	            		}
+	            		
+	            		textarea.setText(result);
 	            	}else {
 	            		textarea.setText("No items found.");
 	            	}	            	
 	            }
 	        });
 			
+			
+			/*
+			 * Container
+			 * */
+			setLayout(new GridBagLayout());
+			GridBagConstraints constraints = new GridBagConstraints();
 			
 			constraints.gridy = 0;
 			add(inputsPanel, constraints);

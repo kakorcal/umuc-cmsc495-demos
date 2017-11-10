@@ -13,9 +13,17 @@ public class Inventory {
 	private String name;
 	private int quantity;
 	
-	public Inventory() {
+	// default constructor
+	public Inventory() {}
+	
+	// for creating new inventory
+	public Inventory(String name, int quantity) {
+		super();
+		this.name = name;
+		this.quantity = quantity;
 	}
 	
+	// for updating inventory
 	public Inventory(long id, String name, int quantity) {
 		super();
 		this.id = id;
